@@ -377,7 +377,7 @@
     <!-- GANTI isi data-tiktok-url dengan link video TikTok kamu (contoh: https://www.tiktok.com/@user/video/7123456789012345678) -->
     <div class="map-card gborder">
       <div class="map-video-wrap">
-        <iframe class="map-video" data-tiktok-url="https://www.tiktok.com/@ridho_videooo/video/7648612632928275732" title="Preview Mount NIGHT" loading="lazy" allow="autoplay; encrypted-media; fullscreen" allowfullscreen frameborder="0"></iframe>
+        <iframe class="map-video" data-tiktok-url="https://www.tiktok.com/@ridho_videooo/video/7648612632928275732" title="Preview Mount NIGHT" allow="autoplay; encrypted-media; fullscreen" allowfullscreen frameborder="0"></iframe>
         <div class="map-video-empty">🎬<br>Link TikTok belum diisi</div>
       </div>
       <div class="map-badge badge-blue">⛰️ Night Map</div>
@@ -392,7 +392,7 @@
     <!-- GANTI isi data-tiktok-url dengan link video TikTok kamu -->
     <div class="map-card gborder">
       <div class="map-video-wrap">
-        <iframe class="map-video" data-tiktok-url="https://www.tiktok.com/@.ridho_video/video/7656541410652343560" title="Preview Nexus UNDERGROUND" loading="lazy" allow="autoplay; encrypted-media; fullscreen" allowfullscreen frameborder="0"></iframe>
+        <iframe class="map-video" data-tiktok-url="https://www.tiktok.com/@.ridho_video/video/7656541410652343560" title="Preview Nexus UNDERGROUND" allow="autoplay; encrypted-media; fullscreen" allowfullscreen frameborder="0"></iframe>
         <div class="map-video-empty">🎬<br>Link TikTok belum diisi</div>
       </div>
       <div class="map-badge badge-red">🔞 18+ Party</div>
@@ -599,19 +599,57 @@
      di tag <iframe class="map-video" ...> pada HTML,
      isi dengan link lengkap video TikTok, contoh:
      https://www.tiktok.com/@user/video/7123456789012345678
-     Hemat CPU/GPU/data: iframe cuma dibuat kalau link diisi,
-     dan loading="lazy" biar video di luar layar belum ditarik.
+
+     Hemat CPU/GPU/data + anti macet di HP:
+     video HANYA dimuat & autoplay saat kartunya kelihatan
+     di layar (≥60%). Begitu discroll keluar layar, video
+     langsung di-unload (bukan cuma dipause) biar tidak
+     rebutan CPU/GPU sama video lain & tidak nge-lag pas scroll.
+     Jadi di HP (1 kolom) cuma 1 video aktif dalam satu waktu.
   ══════════════════════════════════════════ */
+  var TIKTOK_PARAMS = 'autoplay=1&loop=1&muted=1&controls=0&progress_bar=0' +
+    '&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0' +
+    '&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0';
+
+  function activateMapVideo(wrap) {
+    var iframe = wrap.querySelector('.map-video');
+    var id = iframe.dataset.videoId;
+    if (!id || wrap.classList.contains('has-video')) return;
+    iframe.src = 'https://www.tiktok.com/player/v1/' + id + '?' + TIKTOK_PARAMS;
+    wrap.classList.add('has-video');
+  }
+
+  function deactivateMapVideo(wrap) {
+    var iframe = wrap.querySelector('.map-video');
+    if (!wrap.classList.contains('has-video')) return;
+    iframe.src = ''; // lepas video sepenuhnya, bebasin CPU/GPU/RAM
+    wrap.classList.remove('has-video');
+  }
+
   function initMapVideos() {
-    document.querySelectorAll('.map-video').forEach(function(iframe) {
+    var wraps = document.querySelectorAll('.map-video-wrap');
+    var canObserve = 'IntersectionObserver' in window;
+
+    wraps.forEach(function(wrap) {
+      var iframe = wrap.querySelector('.map-video');
       var url = iframe.getAttribute('data-tiktok-url') || '';
       var match = url.match(/video\/(\d+)/) || url.match(/(\d{15,20})/);
       if (!match) return; // link belum diisi, biarkan placeholder tampil
-      var params = 'autoplay=1&loop=1&muted=1&controls=0&progress_bar=0' +
-        '&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0' +
-        '&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0';
-      iframe.src = 'https://www.tiktok.com/player/v1/' + match[1] + '?' + params;
-      iframe.closest('.map-video-wrap').classList.add('has-video');
+      iframe.dataset.videoId = match[1];
+      if (!canObserve) { activateMapVideo(wrap); return; } // fallback browser lama
+    });
+
+    if (!canObserve) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) activateMapVideo(entry.target);
+        else deactivateMapVideo(entry.target);
+      });
+    }, { threshold: 0.6 });
+
+    wraps.forEach(function(wrap) {
+      if (wrap.querySelector('.map-video').dataset.videoId) observer.observe(wrap);
     });
   }
   initMapVideos();
