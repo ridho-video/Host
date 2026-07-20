@@ -81,24 +81,27 @@
     position:absolute; top:0; left:-60%; width:38%; height:100%;
     background:linear-gradient(115deg,
       transparent 0%,
-      rgba(255,255,255,0.15) 30%,
-      rgba(255,255,255,0.95) 50%,
-      rgba(255,255,255,0.15) 70%,
+      rgba(124,196,255,0.18) 22%,
+      rgba(255,255,255,0.6) 40%,
+      rgba(255,255,255,1) 50%,
+      rgba(255,255,255,0.6) 60%,
+      rgba(124,196,255,0.18) 78%,
       transparent 100%);
     mix-blend-mode:screen;
     transform:skewX(-20deg); pointer-events:none;
-    animation:logoSheen 4.8s ease-in-out infinite;
+    animation:logoSheen 6s ease-in-out infinite;
   }
   @keyframes logoFloat{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
   @keyframes logoGlow{
     0%,100%{ filter:drop-shadow(0 0 12px rgba(58,167,255,0.22)); }
     50%{ filter:drop-shadow(0 0 22px rgba(58,167,255,0.5)); }
   }
-  /* kilau: diperlambat (durasi lebih panjang) & lebih sering muncul
-     (porsi jeda kosong dipersingkat jadi 32% siklus, dulu ~55%) */
+  /* kilau: gradasi lebih halus + rona biru tipis di tepi (lebih premium),
+     sapuan diperlambat (6s, dulu 4.8s), jeda kosong dipersingkat jadi
+     cuma 12% siklus (dulu 32%) biar lebih sering kelihatan berkilau */
   @keyframes logoSheen{
     0%{ transform:skewX(-20deg) translateX(0%); }
-    68%,100%{ transform:skewX(-20deg) translateX(542.86%); }
+    88%,100%{ transform:skewX(-20deg) translateX(542.86%); }
   }
 
   /* ---- nameplate header ---- */
@@ -269,34 +272,50 @@
   .map-title{ font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px; }
   .map-desc{ font-size:12px; color:var(--text-dim); line-height:1.7; margin-bottom:16px; }
 
-  /* ---- social bar ---- */
-  .social-bar{display:flex; justify-content:center; gap:12px; margin-top:34px; flex-wrap:wrap;}
-  .social-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:10px 20px; border-radius:100px;
-    font-family:var(--font-body); font-weight:600; font-size:12.5px;
-    color:var(--text); text-decoration:none; transition:transform .12s;
-  }
-  .social-btn:active{ transform:translateY(1px); }
-  .social-icon{ font-size:14px; }
-  .social-yt .social-icon{ color:#ff6b6b; }
-  .social-tt .social-icon{ color:var(--teal); }
-
   /* ---- footer ---- */
   footer{margin-top:30px;}
   .creator-card{ padding:20px; text-align:center; border-radius:var(--radius); }
   .creator-name{ font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--text); margin-bottom:3px; }
   .creator-name span{ color:var(--blue-2); }
   .creator-tag{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-dim); margin-bottom:14px; }
-  .creator-links{ display:flex; gap:8px; }
+
+  /* ---- social / creator links (portfolio style, animasi) ---- */
+  .creator-links{ display:flex; gap:10px; }
   .creator-links a{
-    flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
-    padding:11px 8px; border-radius:9px;
+    flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:11px 10px; border-radius:100px;
     color:var(--text); text-decoration:none;
-    font-family:var(--font-body); font-weight:600; font-size:12px;
+    font-family:var(--font-body); font-weight:600; font-size:12.5px;
+    transition:transform .18s ease, box-shadow .18s ease;
+    animation:socialIn .5s ease both;
   }
-  .creator-links a:active{ color:var(--blue-2); }
-  .creator-links svg{ width:15px; height:15px; flex-shrink:0; }
+  .creator-links a:nth-child(2){ animation-delay:.12s; }
+  .creator-links a:hover{ transform:translateY(-3px); }
+  .creator-links a:active{ transform:translateY(0); color:var(--blue-2); }
+  .social-badge{
+    position:relative; display:flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%; flex-shrink:0;
+    transition:transform .25s ease;
+  }
+  .creator-links a:hover .social-badge{ transform:scale(1.12) rotate(-6deg); }
+  .social-badge::before{
+    content:''; position:absolute; inset:-5px; border-radius:50%;
+    background:inherit; opacity:.4; filter:blur(3px);
+    animation:badgePulse 2.6s ease-in-out infinite;
+  }
+  .social-badge svg{ position:relative; width:13px; height:13px; }
+  .creator-links a.yt .social-badge{ background:#ff0000; }
+  .creator-links a.yt:hover{ box-shadow:0 6px 16px rgba(255,0,0,.32); }
+  .creator-links a.tt .social-badge{ background:#010101; }
+  .creator-links a.tt:hover{ box-shadow:0 6px 16px rgba(37,244,238,.28); }
+  @keyframes badgePulse{
+    0%,100%{ transform:scale(1); opacity:.4; }
+    50%{ transform:scale(1.35); opacity:0; }
+  }
+  @keyframes socialIn{
+    0%{ opacity:0; transform:translateY(10px) scale(.92); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
   .fine-print{ margin-top:16px; text-align:center; font-size:10.5px; color:var(--text-dimmer); line-height:1.7; }
 
   /* ---- toast ---- */
@@ -376,7 +395,7 @@
         </video>
       </div>
       <div class="map-badge badge-blue">⛰️ Night Map</div>
-      <div class="map-title">Mount NIGHT</div>
+      <div class="map-title">Mount Night</div>
       <div class="map-desc">Petualangan malam yang epik di pegunungan misterius. Eksplorasi landscape gelap yang indah dengan efek cahaya yang memukau.</div>
       <button onclick="openRobloxMap('1ed2b41c4bb49b4fbd520c0511eb5642')" class="btn gborder btn-primary" type="button">
         Mainkan Sekarang
@@ -391,7 +410,7 @@
         </video>
       </div>
       <div class="map-badge badge-red">🔞 16+</div>
-      <div class="map-title">Nexus UNDERGROUND</div>
+      <div class="map-title">NEXSUS UNDERGROUND</div>
       <div class="map-desc">Maps Party eksklusif 16+. Tempat komunitas berkumpul, bersosialisasi, dan menikmati suasana underground yang unik dan seru.</div>
       <button onclick="openRobloxMap('c930cd65ee954d4eb0a1c516534248f8')" class="btn gborder btn-accent" type="button">
         Mainkan Sekarang
@@ -534,12 +553,16 @@
       <div class="creator-name">Creator <span>ridho_video</span></div>
       <div class="creator-tag">layanan resmi — order &amp; komunitas via Discord</div>
       <div class="creator-links">
-        <a href="https://youtube.com/@ridho_video" target="_blank" rel="noopener noreferrer" class="gborder">
-          <span class="social-icon" style="color:#ff6b6b;">▶</span>
+        <a href="https://youtube.com/@ridho_video" target="_blank" rel="noopener noreferrer" class="gborder yt">
+          <span class="social-badge">
+            <svg viewBox="0 0 576 512" fill="#fff" aria-hidden="true"><path d="M549.7,124.1c-6.3-23.7-24.8-42.3-48.3-48.6C458.8,64,288,64,288,64S117.2,64,74.6,75.5c-23.5,6.3-42,24.9-48.3,48.6C15,167,15,256.4,15,256.4s0,89.4,11.3,132.3c6.3,23.7,24.8,41.5,48.3,47.8C117.2,448,288,448,288,448s170.8,0,213.4-11.5c23.5-6.3,42-24.2,48.3-47.8,11.4-42.9,11.4-132.3,11.4-132.3S561.1,167,549.7,124.1ZM232,337.6V176.4L361,257Z"/></svg>
+          </span>
           YouTube
         </a>
-        <a href="https://tiktok.com/@ridho_videooo" target="_blank" rel="noopener noreferrer" class="gborder">
-          <span class="social-icon" style="color:var(--teal);">♪</span>
+        <a href="https://tiktok.com/@ridho_videooo" target="_blank" rel="noopener noreferrer" class="gborder tt">
+          <span class="social-badge">
+            <svg viewBox="0 0 448 512" fill="#fff" aria-hidden="true"><path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/></svg>
+          </span>
           TikTok
         </a>
       </div>
